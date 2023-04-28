@@ -207,6 +207,7 @@ function InsertProject() {
               defaultValue=''
               id='grouped-select'
               label='Grouping'
+              required
               onChange={handleSubject}>
               <MenuItem value='-'>
                 <em>-</em>
