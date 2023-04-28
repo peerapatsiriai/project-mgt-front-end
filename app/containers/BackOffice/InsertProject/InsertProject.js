@@ -34,6 +34,10 @@ function InsertProject() {
     project_status: 'W',
     project_type: '',
     created_by: '60',
+    adviser: [],
+    subadviser: [],
+    committee: [],
+    studen: [],
   });
   const fetchDataCurriculums = async () => {
     const result = await Axios.get(
@@ -66,7 +70,6 @@ function InsertProject() {
       ...prevState,
       [name]: value,
     }));
-    console.log(preprojectData);
   };
 
   const handlePreprojectData = (name, value) => {
@@ -74,7 +77,6 @@ function InsertProject() {
       ...prevState,
       [name]: value,
     }));
-    console.log(preprojectData);
   };
 
   const handleCurriculum = async (event) => {
@@ -137,6 +139,13 @@ function InsertProject() {
     console.log(index);
     studen[index] = e.target.value;
     console.log('Studen : ' + studen);
+  };
+  const handleSubmit = async () => {
+    handlePreprojectData('adviser', adviser);
+    handlePreprojectData('subadviser', subadviser);
+    handlePreprojectData('committee', committee);
+    handlePreprojectData('studen', studen);
+    console.log(preprojectData);
   };
   useEffect(() => {
     fetchDataCurriculums();
@@ -427,11 +436,10 @@ function InsertProject() {
         sx={{ mb: 2 }}>
         <Grid item>
           <Button
+            onClick={handleSubmit}
             variant='outlined'
             color='primary'>
-            <a href='/app/BackOffice/DisplayPreproject/DisplayPreproject'>
               บัณทึกข้อมูลของจง
-            </a>
           </Button>
         </Grid>
       </Grid>
