@@ -18,6 +18,7 @@ const useStyles = makeStyles()((theme, _params, classes) => ({
     marginTop: 0,
     zIndex: 1,
     overflow: 'auto',
+    fontFamily: 'Noto Sans Thai'
   },
   blogWrap: {
     color: theme.palette.text.primary,
