@@ -109,4 +109,8 @@ export const ProjectDoc = loadable(() =>
   import('./General/SearchProject/ProjectDoc'), {
     fallback: <Loading />,
   });
+export const PublicizeTeacher = loadable(() =>
+  import('./General/PublicizeTeacher/PublicizeTeacher'), {
+    fallback: <Loading />,
+  });
 

@@ -25,6 +25,7 @@ import {
   // General Path
   SearchProject,
   ProjectDoc,
+  PublicizeTeacher,
 } from '../pageListAsync';
 
 function Application(props) {
@@ -55,6 +56,7 @@ function Application(props) {
         {/* General Path */}
         <Route exact path="/app/General/SearchProject/SearchProject" component={SearchProject} />
         <Route exact path="/app/General/SearchProject/ProjectDoc" component={ProjectDoc} />
+        <Route exact path="/app/General/PublicizeTeacher/PublicizeTeacher" component={PublicizeTeacher} />
         <Route component={NotFound} />
       </Switch>
     </Dashboard>

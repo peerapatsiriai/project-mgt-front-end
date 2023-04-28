@@ -106,6 +106,12 @@ module.exports = [
         link: '/app/General/SearchProject/SearchProject',
         icon: 'ion-ios-home-outline',
       },
+      {
+        key: 'PublicizeTeacher',
+        name: 'ประชาสัมพันธ์อาจารย์',
+        link: '/app/General/PublicizeTeacher/PublicizeTeacher',
+        icon: 'ion-ios-home-outline',
+      },
     ]
   },
 
