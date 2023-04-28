@@ -430,7 +430,7 @@ function InsertProject() {
             variant='outlined'
             color='primary'>
             <a href='/app/BackOffice/DisplayPreproject/DisplayPreproject'>
-              บัณทึกข้อมูล
+              บัณทึกข้อมูลของจง
             </a>
           </Button>
         </Grid>
