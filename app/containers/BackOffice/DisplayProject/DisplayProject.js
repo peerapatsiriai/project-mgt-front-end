@@ -27,8 +27,17 @@ function createData(code, nameTH, nameEN, detail) {
 }
 
 const rows = [
-  createData('CE010302', 'เครื่องสรรเสริญน้องซายัน', 'GodJongRai', <div> <a style={{ textDecoration: 'none', color: '#32a852' }} href="/app/BackOffice/ProjectDetail/ProjectDetail">รายละเอียด</a> <a style={{ textDecoration: 'none', color: '#ccc20c' }}>แก้ไข</a> <a style={{ textDecoration: 'none', color: 'red' }}>ลบ</a> <a style={{ textDecoration: 'none', color: '#f93dfc' }} href="/app/BackOffice/ProjectDocumentStatus/ProjectDocumentStatus" >อัปโหลดเอกสาร</a></div>),
-  createData('CE010302', 'เครื่องสรรเสริญน้องซายัน', 'GodJongRai', <div> <a style={{ textDecoration: 'none', color: '#32a852' }} href="/app/BackOffice/ProjectDetail/ProjectDetail">รายละเอียด</a> <a style={{ textDecoration: 'none', color: '#ccc20c' }}>แก้ไข</a> <a style={{ textDecoration: 'none', color: 'red' }}>ลบ</a> <a style={{ textDecoration: 'none', color: '#f93dfc' }} href="/app/BackOffice/ProjectDocumentStatus/ProjectDocumentStatus" >อัปโหลดเอกสาร</a> </div>),
+  createData(
+    'CE010302',
+    'เครื่องสรรเสริญน้องซายัน',
+    'GodJongRai',
+    <div>
+      <a style={{ textDecoration: 'none', color: '#32a852', marginRight: 10 }} href="/app/BackOffice/ProjectDetail/ProjectDetail">รายละเอียด</a>
+      <a style={{ textDecoration: 'none', color: '#ccc20c', marginRight: 10 }}>แก้ไข</a>
+      <a style={{ textDecoration: 'none', color: 'red', marginRight: 10 }}>ลบ</a>
+      <a style={{ textDecoration: 'none', color: '#f93dfc', marginRight: 10 }} href="/app/BackOffice/ProjectDocumentStatus/ProjectDocumentStatus" >อัปโหลดเอกสาร</a>
+    </div>
+  ),
 ];
 
 function DisplayProject() {

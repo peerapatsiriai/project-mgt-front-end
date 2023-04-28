@@ -33,9 +33,9 @@ const rows = [
     'GodJongRai',
     <div>
       <a style={{ textDecoration: 'none', color: '#32a852', marginRight: 10 }} href="/app/BackOffice/PreprojectDetail/PreprojectDetail">รายละเอียด</a>
-      <a style={{ textDecoration: 'none', color: '#ccc20c' }}>แก้ไข</a>
-      <a style={{ textDecoration: 'none', color: 'red' }}>ลบ</a>
-      <a style={{ textDecoration: 'none', color: '#f93dfc' }} href="/app/BackOffice/DocumentStatus/DocumentStatus" >อัปโหลดเอกสาร</a>
+      <a style={{ textDecoration: 'none', color: '#ccc20c', marginRight: 10 }}>แก้ไข</a>
+      <a style={{ textDecoration: 'none', color: 'red', marginRight: 10 }}>ลบ</a>
+      <a style={{ textDecoration: 'none', color: '#f93dfc', marginRight: 10 }} href="/app/BackOffice/DocumentStatus/DocumentStatus" >อัปโหลดเอกสาร</a>
       <a href="/app/BackOffice/TransferProject/TransferProject" style={{ textDecoration: 'none', color: '#fc893d' }}>โอนหัวข้อ</a>
     </div>),
 ];

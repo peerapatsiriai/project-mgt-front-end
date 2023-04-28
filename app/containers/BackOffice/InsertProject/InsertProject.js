@@ -429,8 +429,8 @@ function InsertProject() {
           <Button
             variant='outlined'
             color='primary'>
-            <a href='/app/BackOffice/DisplayPreproject/DisplayPreproject'>
-              บัณทึกข้อมูลของจง
+            <a href='/app/BackOffice/DisplayPreproject/DisplayPreproject' style={{ textDecoration: 'none' }}>
+              บัณทึกข้อมูล
             </a>
           </Button>
         </Grid>
