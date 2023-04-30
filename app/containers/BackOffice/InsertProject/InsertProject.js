@@ -22,14 +22,15 @@ function InsertProject() {
   const [adviser, setAdviser] = useState(['-']);
   const [subadviser, setSubAdviser] = useState(['-']);
   const [committee, setCommittee] = useState(['-']);
-  const [studen, setStuden] = useState(['-']);
+  const [studen, setStuden] = useState([['-', '-']]);
+  const [send, setSend] = useState(false);
   const [preprojectData, setPreprojectData] = useState({
     curriculum_id: '',
     subject_id: '',
     year: '',
     section_id: '',
-    project_name_th: '',
-    project_name_eng: '',
+    preproject_name_th: '',
+    preproject_name_eng: '',
     project_code: '',
     project_status: 'W',
     project_type: '',
@@ -37,7 +38,7 @@ function InsertProject() {
     adviser: [],
     subadviser: [],
     committee: [],
-    studen: [],
+    studenlist: [],
   });
   const fetchDataCurriculums = async () => {
     const result = await Axios.get(
@@ -89,19 +90,19 @@ function InsertProject() {
     setSections([]);
   };
   const handleSubject = async (event) => {
-    setYears([]);
-    setSections([]);
     if (event.target.value !== '-') {
       fetchYearInSubject(event.target.value);
       handlePreprojectData('subject_id', event.target.value);
     }
-  };
-  const handleYear = (event) => {
+    setYears([]);
     setSections([]);
+  };
+  const handleYear = async (event) => {
     if (event.target.value !== '-') {
       fetchSections(preprojectData.subject_id, event.target.value);
       handlePreprojectData('year', event.target.value);
     }
+    setSections([]);
   };
   const handleSection = async (event) => {
     if (event.target.value !== '-') {
@@ -118,7 +119,7 @@ function InsertProject() {
     setCommittee(committee.concat('-'));
   };
   const addStuden = () => {
-    setStuden(studen.concat('-'));
+    setStuden(studen.concat([['-', '-']]));
   };
   const handleAdviser = (e, index) => {
     console.log(index);
@@ -135,18 +136,41 @@ function InsertProject() {
     committee[index] = e.target.value;
     console.log('Committee : ' + committee);
   };
-  const handleStuden = (e, index) => {
+  const handleStudenName = (e, index) => {
     console.log(index);
-    studen[index] = e.target.value;
+    studen[index][1] = e.target.value;
     console.log('Studen : ' + studen);
   };
-  const handleSubmit = async () => {
+  const handleStudenNumber = (e, index) => {
+    console.log(index);
+    studen[index][0] = e.target.value;
+    console.log('Studen : ' + studen);
+  };
+  const sendDataToAPI = async () => {
+    console.log('send');
+    try {
+      const response = await Axios.post(
+        'http://localhost:3200/api/insertpreproject',
+        preprojectData
+      );
+      console.log('insert', response);
+    } catch (error) {
+      console.log('error', error);
+    }
+  };
+  const handleSubmit = () => {
     handlePreprojectData('adviser', adviser);
     handlePreprojectData('subadviser', subadviser);
     handlePreprojectData('committee', committee);
-    handlePreprojectData('studen', studen);
-    console.log(preprojectData);
+    handlePreprojectData('studenlist', studen);
+    // ถ้าไม่มีตัวนี้จะส่งค่าที่เป็น array เป็นค่าว่างต้องให้อัปเดทค่าให้หมดก่อนถึงจะส่งค่าไปที่ api
+    setSend(true);
   };
+  useEffect(() => {
+    if (send) {
+      sendDataToAPI();
+    }
+  }, [preprojectData]);
   useEffect(() => {
     fetchDataCurriculums();
   }, []);
@@ -296,7 +320,7 @@ function InsertProject() {
             label='ชื่อโครงงานภาษาไทย'
             variant='outlined'
             sx={{ mx: 5, width: '32.5%' }}
-            name='project_name_th'
+            name='preproject_name_th'
             onChange={handlePreprojectDataFromTextBox}
           />
           <TextField
@@ -304,7 +328,7 @@ function InsertProject() {
             label='ชื่อโครงงานภาษาอังกฤษ'
             variant='outlined'
             sx={{ width: '32.5%' }}
-            name='project_name_eng'
+            name='preproject_name_eng'
             onChange={handlePreprojectDataFromTextBox}
           />
         </div>
@@ -407,13 +431,14 @@ function InsertProject() {
             {studen.map((row, index) => (
               <>
                 <TextField
-                  onChange={(e) => handleStuden(e, index)}
+                  onChange={(e) => handleStudenName(e, index)}
                   id='outlined-basic'
                   label='ชื่อ-นามสกุล'
                   variant='outlined'
                   sx={{ ml: 5, mt: 3, width: '32.5%' }}
                 />
                 <TextField
+                  onChange={(e) => handleStudenNumber(e, index)}
                   id='outlined-basic'
                   label='รหัสนักศึกษา'
                   variant='outlined'
@@ -440,9 +465,7 @@ function InsertProject() {
             onClick={handleSubmit}
             variant='outlined'
             color='primary'>
-            <a href='/app/BackOffice/DisplayPreproject/DisplayPreproject' style={{ textDecoration: 'none' }}>
-              บัณทึกข้อมูล
-            </a>
+            บัณทึกข้อมูล
           </Button>
         </Grid>
       </Grid>
