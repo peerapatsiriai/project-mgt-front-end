@@ -13,6 +13,7 @@ import Divider from '@mui/material/Divider';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import Axios from 'axios';
+import Swal from 'sweetalert2';
 
 function InsertProject() {
   const [curriculums, setCurriculum] = useState([]);
@@ -147,7 +148,7 @@ function InsertProject() {
     console.log('Studen : ' + studen);
   };
   const sendDataToAPI = async () => {
-    console.log('send');
+    console.log(preprojectData);
     try {
       const response = await Axios.post(
         'http://localhost:3200/api/insertpreproject',
@@ -158,19 +159,33 @@ function InsertProject() {
       console.log('error', error);
     }
   };
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     handlePreprojectData('adviser', adviser);
     handlePreprojectData('subadviser', subadviser);
     handlePreprojectData('committee', committee);
     handlePreprojectData('studenlist', studen);
-    // ถ้าไม่มีตัวนี้จะส่งค่าที่เป็น array เป็นค่าว่างต้องให้อัปเดทค่าให้หมดก่อนถึงจะส่งค่าไปที่ api
-    setSend(true);
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'You want to insert this project',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes Insert it',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setSend(true);
+      } else {
+        console.log('back');
+        setSend(false);
+      }
+    });
   };
   useEffect(() => {
     if (send) {
       sendDataToAPI();
     }
-  }, [preprojectData]);
+  }, [send]);
   useEffect(() => {
     fetchDataCurriculums();
   }, []);
