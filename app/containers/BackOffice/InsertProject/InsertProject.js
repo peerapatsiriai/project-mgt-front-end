@@ -23,6 +23,7 @@ function InsertProject() {
   const [adviser, setAdviser] = useState(['-']);
   const [subadviser, setSubAdviser] = useState(['-']);
   const [committee, setCommittee] = useState(['-']);
+  const [instructor, setInstructor] = useState(['-']);
   const [studen, setStuden] = useState([['-', '-']]);
   const [send, setSend] = useState(false);
   const [preprojectData, setPreprojectData] = useState({
@@ -47,23 +48,29 @@ function InsertProject() {
     );
     setCurriculum(result.data.data);
   };
+  const fetchDataInstructor = async () => {
+    const result = await Axios.get(
+      'http://localhost:3200/api/project-mgt/instructors'
+    );
+    setInstructor(result.data.data);
+  };
   const fetchDataSubject = async (subjectID) => {
     const subjectList = await Axios.get(
       `http://localhost:3200/api/project-mgt/curriculums/subjects?curriculum_id=${subjectID}`
     );
-    setSubject(subjectList.data.data);
+    if (subjectList.data.data.length > 0) setSubject(subjectList.data.data);
   };
   const fetchYearInSubject = async (year) => {
     const yearList = await Axios.get(
       `http://localhost:3200/api/project-mgt/curriculums/subjects/year?subject_id=${year}`
     );
-    setYears(yearList.data.data);
+    if (yearList.data.data.length > 0)setYears(yearList.data.data);
   };
   const fetchSections = async (subjectID, year) => {
     const sectionList = await Axios.get(
       `http://localhost:3200/api/project-mgt/curriculums/subjects/year/sections?subject_id=${subjectID}&year=${year}`
     );
-    setSections(sectionList.data.data);
+    if (sectionList.data.data.length > 0) setSections(sectionList.data.data);
   };
 
   const handlePreprojectDataFromTextBox = (event) => {
@@ -123,38 +130,45 @@ function InsertProject() {
     setStuden(studen.concat([['-', '-']]));
   };
   const handleAdviser = (e, index) => {
-    console.log(index);
+    // console.log(index);
     adviser[index] = e.target.value;
-    console.log('Adviser : ' + adviser);
+    // console.log('Adviser : ' + adviser);
   };
   const handleSubAdviser = (e, index) => {
-    console.log(index);
+    // console.log(index);
     subadviser[index] = e.target.value;
-    console.log('SubAdviser : ' + subadviser);
+    // console.log('SubAdviser : ' + subadviser);
   };
   const handleCommittee = (e, index) => {
-    console.log(index);
+    // console.log(index);
     committee[index] = e.target.value;
-    console.log('Committee : ' + committee);
+    // console.log('Committee : ' + committee);
   };
   const handleStudenName = (e, index) => {
-    console.log(index);
+    // console.log(index);
     studen[index][1] = e.target.value;
-    console.log('Studen : ' + studen);
+    // console.log('Studen : ' + studen);
   };
   const handleStudenNumber = (e, index) => {
-    console.log(index);
+    // console.log(index);
     studen[index][0] = e.target.value;
-    console.log('Studen : ' + studen);
+    // console.log('Studen : ' + studen);
   };
   const sendDataToAPI = async () => {
-    console.log(preprojectData);
+    // console.log(isPreprojectDataValid);
+    // console.log(preprojectData);
     try {
       const response = await Axios.post(
         'http://localhost:3200/api/insertpreproject',
         preprojectData
       );
-      console.log('insert', response);
+      Swal.fire(
+        'เพิ่มข้อมูลสำเร็จ',
+        'ข้อมูลข้อท่านถูกเพิ่มเข้าไปในระบบเรียบร้อยแล้ว',
+        'success'
+      );
+      console.log(response);
+      setSend(false);
     } catch (error) {
       console.log('error', error);
     }
@@ -165,16 +179,33 @@ function InsertProject() {
     handlePreprojectData('committee', committee);
     handlePreprojectData('studenlist', studen);
     Swal.fire({
-      title: 'Are you sure?',
-      text: 'You want to insert this project',
-      icon: 'warning',
+      title: 'คุณต้องการส่งข้อมูลเข้าสู่ระบบหรือไม่',
+      icon: 'question',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes Insert it',
+      cancelButtonText: 'ยกเลิก',
+      confirmButtonText: 'เพิ่มข้อมูล',
     }).then((result) => {
       if (result.isConfirmed) {
-        setSend(true);
+        // ตรวจสอบว่าค่าก่อนที่จะส่งมีค่าว่างอยู่ไหม
+        let checkDataIsNotNull = Object.values(preprojectData).every(
+          (prop) => prop !== ''
+        );
+        if (
+          preprojectData.adviser[0] === '-' || preprojectData.committee[0] === '-' || preprojectData.studenlist[0] === '-'
+        ) {
+          checkDataIsNotNull = false;
+        }
+        if (checkDataIsNotNull) {
+          setSend(true);
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: '',
+            text: 'กรุณากรอกข้อมูลให้ครบ',
+          });
+        }
       } else {
         console.log('back');
         setSend(false);
@@ -186,8 +217,9 @@ function InsertProject() {
       sendDataToAPI();
     }
   }, [send]);
-  useEffect(() => {
+  useEffect(async () => {
     fetchDataCurriculums();
+    fetchDataInstructor();
   }, []);
   const title = brand.name + ' - AddProject';
   const description = brand.desc;
@@ -364,8 +396,13 @@ function InsertProject() {
                     <MenuItem value={row}>
                       <em>-</em>
                     </MenuItem>
-                    <MenuItem value={1}>อาจารย์ จงลัย ชิงดาบ</MenuItem>
-                    <MenuItem value={2}>อาจารย์ จงลัย ชิ้งชั้ง</MenuItem>
+                    {instructor.map((data, indexInstructor) => (
+                      <MenuItem
+                        key={indexInstructor}
+                        value={data.instructor_id}>
+                        {data.instructors_name}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
               </>
@@ -394,8 +431,13 @@ function InsertProject() {
                     <MenuItem value={row}>
                       <em>-</em>
                     </MenuItem>
-                    <MenuItem value={1}>อาจารย์ จงลัย ชิงดาบ</MenuItem>
-                    <MenuItem value={2}>อาจารย์ จงลัย ชิ้งชั้ง</MenuItem>
+                    {instructor.map((data, indexInstructor) => (
+                      <MenuItem
+                        key={indexInstructor}
+                        value={data.instructor_id}>
+                        {data.instructors_name}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
               </>
@@ -421,10 +463,15 @@ function InsertProject() {
                     id='grouped-select'
                     label='Grouping'>
                     <MenuItem value={row}>
-                      <em>None</em>
+                      <em>-</em>
                     </MenuItem>
-                    <MenuItem value={1}>อาจารย์ จงลัย ชิงดาบ</MenuItem>
-                    <MenuItem value={2}>อาจารย์ จงลัย ชิ้งชั้ง</MenuItem>
+                    {instructor.map((data, indexInstructor) => (
+                      <MenuItem
+                        key={indexInstructor}
+                        value={data.instructor_id}>
+                        {data.instructors_name}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
               </>
