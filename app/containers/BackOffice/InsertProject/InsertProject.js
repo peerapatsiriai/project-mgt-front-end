@@ -13,6 +13,7 @@ import Divider from '@mui/material/Divider';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import Axios from 'axios';
+import Swal from 'sweetalert2';
 
 function InsertProject() {
   const [curriculums, setCurriculum] = useState([]);
@@ -22,14 +23,16 @@ function InsertProject() {
   const [adviser, setAdviser] = useState(['-']);
   const [subadviser, setSubAdviser] = useState(['-']);
   const [committee, setCommittee] = useState(['-']);
-  const [studen, setStuden] = useState(['-']);
+  const [instructor, setInstructor] = useState(['-']);
+  const [studen, setStuden] = useState([['-', '-']]);
+  const [send, setSend] = useState(false);
   const [preprojectData, setPreprojectData] = useState({
     curriculum_id: '',
     subject_id: '',
     year: '',
     section_id: '',
-    project_name_th: '',
-    project_name_eng: '',
+    preproject_name_th: '',
+    preproject_name_eng: '',
     project_code: '',
     project_status: 'W',
     project_type: '',
@@ -37,7 +40,7 @@ function InsertProject() {
     adviser: [],
     subadviser: [],
     committee: [],
-    studen: [],
+    studenlist: [],
   });
   const fetchDataCurriculums = async () => {
     const result = await Axios.get(
@@ -45,23 +48,29 @@ function InsertProject() {
     );
     setCurriculum(result.data.data);
   };
+  const fetchDataInstructor = async () => {
+    const result = await Axios.get(
+      'http://localhost:3200/api/project-mgt/instructors'
+    );
+    setInstructor(result.data.data);
+  };
   const fetchDataSubject = async (subjectID) => {
     const subjectList = await Axios.get(
       `http://localhost:3200/api/project-mgt/curriculums/subjects?curriculum_id=${subjectID}`
     );
-    setSubject(subjectList.data.data);
+    if (subjectList.data.data.length > 0) setSubject(subjectList.data.data);
   };
   const fetchYearInSubject = async (year) => {
     const yearList = await Axios.get(
       `http://localhost:3200/api/project-mgt/curriculums/subjects/year?subject_id=${year}`
     );
-    setYears(yearList.data.data);
+    if (yearList.data.data.length > 0)setYears(yearList.data.data);
   };
   const fetchSections = async (subjectID, year) => {
     const sectionList = await Axios.get(
       `http://localhost:3200/api/project-mgt/curriculums/subjects/year/sections?subject_id=${subjectID}&year=${year}`
     );
-    setSections(sectionList.data.data);
+    if (sectionList.data.data.length > 0) setSections(sectionList.data.data);
   };
 
   const handlePreprojectDataFromTextBox = (event) => {
@@ -89,19 +98,19 @@ function InsertProject() {
     setSections([]);
   };
   const handleSubject = async (event) => {
-    setYears([]);
-    setSections([]);
     if (event.target.value !== '-') {
       fetchYearInSubject(event.target.value);
       handlePreprojectData('subject_id', event.target.value);
     }
-  };
-  const handleYear = (event) => {
+    setYears([]);
     setSections([]);
+  };
+  const handleYear = async (event) => {
     if (event.target.value !== '-') {
       fetchSections(preprojectData.subject_id, event.target.value);
       handlePreprojectData('year', event.target.value);
     }
+    setSections([]);
   };
   const handleSection = async (event) => {
     if (event.target.value !== '-') {
@@ -118,37 +127,99 @@ function InsertProject() {
     setCommittee(committee.concat('-'));
   };
   const addStuden = () => {
-    setStuden(studen.concat('-'));
+    setStuden(studen.concat([['-', '-']]));
   };
   const handleAdviser = (e, index) => {
-    console.log(index);
+    // console.log(index);
     adviser[index] = e.target.value;
-    console.log('Adviser : ' + adviser);
+    // console.log('Adviser : ' + adviser);
   };
   const handleSubAdviser = (e, index) => {
-    console.log(index);
+    // console.log(index);
     subadviser[index] = e.target.value;
-    console.log('SubAdviser : ' + subadviser);
+    // console.log('SubAdviser : ' + subadviser);
   };
   const handleCommittee = (e, index) => {
-    console.log(index);
+    // console.log(index);
     committee[index] = e.target.value;
-    console.log('Committee : ' + committee);
+    // console.log('Committee : ' + committee);
   };
-  const handleStuden = (e, index) => {
-    console.log(index);
-    studen[index] = e.target.value;
-    console.log('Studen : ' + studen);
+  const handleStudenName = (e, index) => {
+    // console.log(index);
+    studen[index][1] = e.target.value;
+    // console.log('Studen : ' + studen);
+  };
+  const handleStudenNumber = (e, index) => {
+    // console.log(index);
+    studen[index][0] = e.target.value;
+    // console.log('Studen : ' + studen);
+  };
+  const sendDataToAPI = async () => {
+    // console.log(isPreprojectDataValid);
+    // console.log(preprojectData);
+    try {
+      const response = await Axios.post(
+        'http://localhost:3200/api/insertpreproject',
+        preprojectData
+      );
+      Swal.fire(
+        'เพิ่มข้อมูลสำเร็จ',
+        'ข้อมูลข้อท่านถูกเพิ่มเข้าไปในระบบเรียบร้อยแล้ว',
+        'success'
+      );
+      console.log(response);
+      setSend(false);
+    } catch (error) {
+      console.log('error', error);
+    }
   };
   const handleSubmit = async () => {
     handlePreprojectData('adviser', adviser);
     handlePreprojectData('subadviser', subadviser);
     handlePreprojectData('committee', committee);
-    handlePreprojectData('studen', studen);
-    console.log(preprojectData);
+    handlePreprojectData('studenlist', studen);
+    Swal.fire({
+      title: 'คุณต้องการส่งข้อมูลเข้าสู่ระบบหรือไม่',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      cancelButtonText: 'ยกเลิก',
+      confirmButtonText: 'เพิ่มข้อมูล',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // ตรวจสอบว่าค่าก่อนที่จะส่งมีค่าว่างอยู่ไหม
+        let checkDataIsNotNull = Object.values(preprojectData).every(
+          (prop) => prop !== ''
+        );
+        if (
+          preprojectData.adviser[0] === '-' || preprojectData.committee[0] === '-' || preprojectData.studenlist[0] === '-'
+        ) {
+          checkDataIsNotNull = false;
+        }
+        if (checkDataIsNotNull) {
+          setSend(true);
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: '',
+            text: 'กรุณากรอกข้อมูลให้ครบ',
+          });
+        }
+      } else {
+        console.log('back');
+        setSend(false);
+      }
+    });
   };
   useEffect(() => {
+    if (send) {
+      sendDataToAPI();
+    }
+  }, [send]);
+  useEffect(async () => {
     fetchDataCurriculums();
+    fetchDataInstructor();
   }, []);
   const title = brand.name + ' - AddProject';
   const description = brand.desc;
@@ -296,7 +367,7 @@ function InsertProject() {
             label='ชื่อโครงงานภาษาไทย'
             variant='outlined'
             sx={{ mx: 5, width: '32.5%' }}
-            name='project_name_th'
+            name='preproject_name_th'
             onChange={handlePreprojectDataFromTextBox}
           />
           <TextField
@@ -304,7 +375,7 @@ function InsertProject() {
             label='ชื่อโครงงานภาษาอังกฤษ'
             variant='outlined'
             sx={{ width: '32.5%' }}
-            name='project_name_eng'
+            name='preproject_name_eng'
             onChange={handlePreprojectDataFromTextBox}
           />
         </div>
@@ -325,8 +396,13 @@ function InsertProject() {
                     <MenuItem value={row}>
                       <em>-</em>
                     </MenuItem>
-                    <MenuItem value={1}>อาจารย์ จงลัย ชิงดาบ</MenuItem>
-                    <MenuItem value={2}>อาจารย์ จงลัย ชิ้งชั้ง</MenuItem>
+                    {instructor.map((data, indexInstructor) => (
+                      <MenuItem
+                        key={indexInstructor}
+                        value={data.instructor_id}>
+                        {data.instructors_name}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
               </>
@@ -355,8 +431,13 @@ function InsertProject() {
                     <MenuItem value={row}>
                       <em>-</em>
                     </MenuItem>
-                    <MenuItem value={1}>อาจารย์ จงลัย ชิงดาบ</MenuItem>
-                    <MenuItem value={2}>อาจารย์ จงลัย ชิ้งชั้ง</MenuItem>
+                    {instructor.map((data, indexInstructor) => (
+                      <MenuItem
+                        key={indexInstructor}
+                        value={data.instructor_id}>
+                        {data.instructors_name}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
               </>
@@ -382,10 +463,15 @@ function InsertProject() {
                     id='grouped-select'
                     label='Grouping'>
                     <MenuItem value={row}>
-                      <em>None</em>
+                      <em>-</em>
                     </MenuItem>
-                    <MenuItem value={1}>อาจารย์ จงลัย ชิงดาบ</MenuItem>
-                    <MenuItem value={2}>อาจารย์ จงลัย ชิ้งชั้ง</MenuItem>
+                    {instructor.map((data, indexInstructor) => (
+                      <MenuItem
+                        key={indexInstructor}
+                        value={data.instructor_id}>
+                        {data.instructors_name}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
               </>
@@ -407,13 +493,14 @@ function InsertProject() {
             {studen.map((row, index) => (
               <>
                 <TextField
-                  onChange={(e) => handleStuden(e, index)}
+                  onChange={(e) => handleStudenName(e, index)}
                   id='outlined-basic'
                   label='ชื่อ-นามสกุล'
                   variant='outlined'
                   sx={{ ml: 5, mt: 3, width: '32.5%' }}
                 />
                 <TextField
+                  onChange={(e) => handleStudenNumber(e, index)}
                   id='outlined-basic'
                   label='รหัสนักศึกษา'
                   variant='outlined'
@@ -440,9 +527,7 @@ function InsertProject() {
             onClick={handleSubmit}
             variant='outlined'
             color='primary'>
-            <a href='/app/BackOffice/DisplayPreproject/DisplayPreproject' style={{ textDecoration: 'none' }}>
-              บัณทึกข้อมูล
-            </a>
+            บัณทึกข้อมูล
           </Button>
         </Grid>
       </Grid>
