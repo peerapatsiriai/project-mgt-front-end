@@ -217,7 +217,7 @@ function InsertProject() {
       sendDataToAPI();
     }
   }, [send]);
-  useEffect(async () => {
+  useEffect(() => {
     fetchDataCurriculums();
     fetchDataInstructor();
   }, []);
